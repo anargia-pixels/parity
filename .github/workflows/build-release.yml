@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "release binaries unchanged"
             exit 0
           fi
