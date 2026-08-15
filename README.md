@@ -29,9 +29,12 @@ Built with Bun. No runtime dependencies.
 1. Install:
 
    ```sh
-   bun run build
-   install -Dm755 parity ~/.local/bin/parity
+   curl -fsSL https://raw.githubusercontent.com/Doctorthe113/parity/main/install.sh | bash
    ```
+
+   This downloads the compiled binary from the repo's `release/` folder
+   into `~/.local/bin` (override with `PARITY_INSTALL_DIR`). A Linux x86_64
+   binary is the only target. Make sure `~/.local/bin` is on your PATH.
 
 2. Create `~/.config/parity/parity.toml` (copy `parity-example.toml`).
    Each `[label]` table maps one local git folder to a unique name shared
@@ -78,7 +81,10 @@ systemctl --user enable --now parity
 bun run src/main.ts --help   # dev builds read ./parity.toml
 bun test
 bun run build                # compile to ./parity
+bun run build:release        # compile to ./release/parity (what install.sh fetches)
 ```
+
+To ship a new binary, run `bun run build:release` and commit `release/parity`.
 
 Runtime files (pid, log, state, locks) live in `~/.config/parity/`, or in
 `$PARITY_STATE_DIR` when set.

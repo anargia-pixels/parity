@@ -6,6 +6,7 @@
   "scripts": {
     "start": "bun run src/main.ts",
     "build": "bun build --compile ./src/main.ts --outfile parity --target=bun-linux-x64",
+    "build:release": "bun build --compile ./src/main.ts --outfile release/parity --target=bun-linux-x64",
     "test": "bun test"
   },
   "devDependencies": {
