@@ -36,3 +36,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # parity
 parity.toml
 /parity
+
+# raw release binaries (the .gz files are committed)
+release/parity-linux-x64
+release/parity-linux-arm64

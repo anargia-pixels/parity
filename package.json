@@ -6,7 +6,7 @@
   "scripts": {
     "start": "bun run src/main.ts",
     "build": "bun build --compile ./src/main.ts --outfile parity --target=bun-linux-x64",
-    "build:release": "bun build --compile ./src/main.ts --outfile release/parity-linux-x64 --target=bun-linux-x64 && bun build --compile ./src/main.ts --outfile release/parity-linux-arm64 --target=bun-linux-arm64",
+    "build:release": "bun build --compile ./src/main.ts --outfile release/parity-linux-x64 --target=bun-linux-x64 && bun build --compile ./src/main.ts --outfile release/parity-linux-arm64 --target=bun-linux-arm64 && gzip -f -9 release/parity-linux-x64 release/parity-linux-arm64",
     "test": "bun test"
   },
   "devDependencies": {

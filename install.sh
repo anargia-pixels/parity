@@ -25,14 +25,15 @@ case "$(uname -m)" in
 esac
 
 # The raw.githubusercontent.com endpoint refuses files this large, so fetch
-# the blob through the API instead.
-RELEASE_URL="https://api.github.com/repos/${REPO}/contents/release/parity-linux-${ARCH}"
+# the blob through the API instead. Releases are gzip-compressed to keep the
+# download small.
+RELEASE_URL="https://api.github.com/repos/${REPO}/contents/release/parity-linux-${ARCH}.gz"
 
 mkdir -p "$INSTALL_DIR"
 
 echo "downloading parity (linux-${ARCH}) to $INSTALL_DIR/parity"
 curl -fsSL --retry 3 -H "Accept: application/vnd.github.raw" \
-  "$RELEASE_URL" -o "$INSTALL_DIR/parity"
+  "$RELEASE_URL" | gunzip > "$INSTALL_DIR/parity"
 chmod +x "$INSTALL_DIR/parity"
 
 case ":$PATH:" in

@@ -32,8 +32,8 @@ Built with Bun. No runtime dependencies.
    curl -fsSL https://raw.githubusercontent.com/Doctorthe113/parity/main/install.sh | bash
    ```
 
-   This downloads the compiled binary for your architecture (x86_64 or
-   arm64) from the repo's `release/` folder into `~/.local/bin` (override
+   This downloads the gzip-compressed binary for your architecture (x86_64
+   or arm64) from the repo's `release/` folder into `~/.local/bin` (override
    with `PARITY_INSTALL_DIR`). Binaries are rebuilt automatically on every
    push to main by GitHub Actions. Make sure `~/.local/bin` is on your PATH.
 
@@ -82,7 +82,7 @@ systemctl --user enable --now parity
 bun run src/main.ts --help   # dev builds read ./parity.toml
 bun test
 bun run build                # compile to ./parity
-bun run build:release        # compile both archs into release/
+bun run build:release        # compile both archs into release/ (gzipped)
 ```
 
 `release/` is kept up to date by the `Build release binaries` workflow on
