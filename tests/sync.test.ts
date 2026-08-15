@@ -65,7 +65,7 @@ describe("syncEntry", () => {
     const { bare, clone } = setupRepos(testBase, "happy");
     
     Bun.write(join(clone, "a.txt"), "hello");
-    const outcome = await syncEntry({ label: "happy", localDir: clone }, { allowSecrets: false });
+    const outcome = await syncEntry({ label: "happy", localDir: clone }, { allowSecrets: false, progress: false });
     expect(outcome.status).toBe("ok");
     expect(gitRun(bare, ["log", "--oneline"]).stdout).toContain("sync");
     expect(gitRun(bare, ["show", "HEAD:a.txt"]).stdout).toBe("hello");
@@ -74,7 +74,7 @@ describe("syncEntry", () => {
   test("skips silently when nothing to commit", async () => {
     const { bare, clone } = setupRepos(testBase, "empty");
     
-    const outcome = await syncEntry({ label: "empty", localDir: clone }, { allowSecrets: false });
+    const outcome = await syncEntry({ label: "empty", localDir: clone }, { allowSecrets: false, progress: false });
     expect(outcome).toEqual({ status: "skipped", reason: "empty", files: [] });
     expect(gitRun(bare, ["log", "--oneline"]).stdout).toBe("");
   });
@@ -83,14 +83,14 @@ describe("syncEntry", () => {
     const { bare, clone } = setupRepos(testBase, "secrets");
     
     Bun.write(join(clone, "config.toml"), 'api_key = "abcdefghijklmnopqr"\n');
-    const blocked = await syncEntry({ label: "secrets", localDir: clone }, { allowSecrets: false });
+    const blocked = await syncEntry({ label: "secrets", localDir: clone }, { allowSecrets: false, progress: false });
     expect(blocked.status).toBe("skipped");
     if (blocked.status === "skipped") {
       expect(blocked.reason).toBe("secrets");
       expect(blocked.files).toContain("config.toml");
     }
     expect(gitRun(bare, ["log", "--oneline"]).stdout).toBe("");
-    const allowed = await syncEntry({ label: "secrets", localDir: clone }, { allowSecrets: true });
+    const allowed = await syncEntry({ label: "secrets", localDir: clone }, { allowSecrets: true, progress: false });
     expect(allowed.status).toBe("ok");
     expect(gitRun(bare, ["log", "--oneline"]).stdout).toContain("sync");
   });
@@ -119,7 +119,7 @@ describe("syncEntry", () => {
     gitRun(cloneA, ["commit", "-m", "remote change"]);
     gitRun(cloneA, ["push"]);
 
-    const outcome = await syncEntry({ label: "stash-happy", localDir: cloneB }, { allowSecrets: false });
+    const outcome = await syncEntry({ label: "stash-happy", localDir: cloneB }, { allowSecrets: false, progress: false });
     expect(outcome.status).toBe("ok");
     expect(gitRun(cloneB, ["stash", "list"]).stdout).toBe("");
     const merged = Bun.file(join(cloneB, "f.txt"));
@@ -147,7 +147,7 @@ describe("syncEntry", () => {
     gitRun(cloneA, ["commit", "-m", "remote change"]);
     gitRun(cloneA, ["push"]);
 
-    const outcome = await syncEntry({ label: "conflict", localDir: cloneB }, { allowSecrets: false });
+    const outcome = await syncEntry({ label: "conflict", localDir: cloneB }, { allowSecrets: false, progress: false });
     expect(outcome.status).toBe("error");
     if (outcome.status === "error") {
       expect(outcome.message).toContain("stash preserved");
@@ -159,14 +159,14 @@ describe("syncEntry", () => {
     const plain = mkdtempSync(join(tmpdir(), "parity-plain-"));
     plainDirs.push(plain);
     
-    const outcome = await syncEntry({ label: "plain", localDir: plain }, { allowSecrets: false });
+    const outcome = await syncEntry({ label: "plain", localDir: plain }, { allowSecrets: false, progress: false });
     expect(outcome.status).toBe("error");
     if (outcome.status === "error") {
       expect(outcome.message).toContain("not a git repository");
     }
 
     gitRun(plain, ["init"]);
-    const noRemote = await syncEntry({ label: "plain", localDir: plain }, { allowSecrets: false });
+    const noRemote = await syncEntry({ label: "plain", localDir: plain }, { allowSecrets: false, progress: false });
     expect(noRemote.status).toBe("error");
     if (noRemote.status === "error") {
       expect(noRemote.message).toContain("no git remote");

@@ -1,6 +1,7 @@
 import { openSync } from "node:fs";
 import { ensureStateDir, loadConfig, logFilePath, pidFilePath, type ParityConfig } from "./lib/config";
 import { isPidAlive } from "./lib/lock";
+import { isTty } from "./lib/progress";
 import { readState, writeState } from "./lib/state";
 import { tryCatch, tryCatchSync } from "./lib/try-catch";
 import { daemonPid, runWatcher } from "./watch";
@@ -25,6 +26,9 @@ usage:
 
   parity status
       Show watcher status and the last sync result per label.
+
+  parity list
+      List the configured folders being watched.
 
 options:
   --config <path>   Use a specific config file.
@@ -107,6 +111,9 @@ async function dispatch(args: ParsedArgs): Promise<void> {
     case "status":
       await runStatusCommand();
       break;
+    case "list":
+      await runListCommand(await loadConfig(args.configPath));
+      break;
     default:
       console.error(`unknown command: ${args.subcommand}\n\n${HELP}`);
       process.exit(1);
@@ -133,6 +140,7 @@ async function runWatchCommand(config: ParityConfig, args: ParsedArgs): Promise<
 
 async function runSyncCommand(config: ParityConfig, args: ParsedArgs): Promise<void> {
   const allowSecrets = args.flags.has("--allow-secrets");
+  const options = { allowSecrets, progress: await isTty() };
   const label = args.positionals[0];
 
   if (label) {
@@ -140,7 +148,7 @@ async function runSyncCommand(config: ParityConfig, args: ParsedArgs): Promise<v
     if (!entry) {
       fail(new Error(`no entry labeled "${label}" in ${config.path}`));
     }
-    const outcome = await syncEntry(entry, { allowSecrets });
+    const outcome = await syncEntry(entry, options);
     await writeState({
       [label]: {
         lastSync: timestamp(),
@@ -152,12 +160,18 @@ async function runSyncCommand(config: ParityConfig, args: ParsedArgs): Promise<v
     process.exit(outcome.status === "error" ? 1 : 0);
   }
 
-  const outcomes = await syncAll(config.entries, { allowSecrets });
+  const outcomes = await syncAll(config.entries, options);
   for (const [entryLabel, outcome] of outcomes) {
     printOutcome(entryLabel, outcome);
   }
   const failed = [...outcomes.values()].some((o) => o.status === "error");
   process.exit(failed ? 1 : 0);
+}
+
+async function runListCommand(config: ParityConfig): Promise<void> {
+  for (const entry of config.entries) {
+    console.log(`${entry.label.padEnd(16)} ${entry.localDir}`);
+  }
 }
 
 function printOutcome(label: string, outcome: Awaited<ReturnType<typeof syncEntry>>): void {

@@ -4,9 +4,12 @@ import type { Entry } from "./lib/config";
 import { parityDir } from "./lib/config";
 import { git, hasRemote, identityFlags, isGitRepo, repoIdentity } from "./lib/git";
 import { acquireLock, releaseLock } from "./lib/lock";
+import { createProgressBar, isTty, type ProgressBar } from "./lib/progress";
 import { checkStagedForSecrets } from "./lib/secret-check";
 import type { EntryState } from "./lib/state";
 import { writeState } from "./lib/state";
+
+const SYNC_STEPS = ["pulling", "staging", "committing", "pushing"];
 
 export type SyncOutcome =
   | { status: "ok" }
@@ -15,6 +18,7 @@ export type SyncOutcome =
 
 export type SyncOptions = {
   allowSecrets: boolean;
+  progress: boolean;
 };
 
 /** `YYYY-MM-DD HH:MM:SS` local time. */
@@ -47,16 +51,19 @@ export async function syncEntry(entry: Entry, options: SyncOptions): Promise<Syn
     return { status: "error", message: `sync already in progress for ${label}` };
   }
 
+  const bar = options.progress && (await isTty()) ? createProgressBar(SYNC_STEPS) : null;
   try {
-    return await doSync(entry, options);
+    return await doSync(entry, options, bar);
   } finally {
+    bar?.finish();
     await releaseLock(parityDir(), label);
   }
 }
 
-async function doSync(entry: Entry, options: SyncOptions): Promise<SyncOutcome> {
+async function doSync(entry: Entry, options: SyncOptions, bar: ProgressBar | null): Promise<SyncOutcome> {
   const { label, localDir: dir } = entry;
 
+  bar?.setStep(0);
   const pull = await git(dir, ["pull"]);
   if (pull.exitCode !== 0 && !hasNoUpstream(pull.stderr)) {
     const restored = await stashPullPop(dir, label, pull);
@@ -65,6 +72,7 @@ async function doSync(entry: Entry, options: SyncOptions): Promise<SyncOutcome> 
     }
   }
 
+  bar?.setStep(1);
   const add = await git(dir, ["add", "-A", "."]);
   if (add.exitCode !== 0) {
     return { status: "error", message: `git add failed: ${add.stderr}` };
@@ -89,11 +97,13 @@ async function doSync(entry: Entry, options: SyncOptions): Promise<SyncOutcome> 
 
   const identity = await repoIdentity(dir);
   const message = `sync ${timestamp()} ${hostname()}`;
+  bar?.setStep(2);
   const commit = await git(dir, [...identityFlags(identity), "commit", "-m", message]);
   if (commit.exitCode !== 0) {
     return { status: "error", message: `git commit failed: ${commit.stderr}` };
   }
 
+  bar?.setStep(3);
   const push = await git(dir, ["push"]);
   if (push.exitCode !== 0) {
     return { status: "error", message: `git push failed: ${push.stderr}` };

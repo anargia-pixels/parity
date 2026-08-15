@@ -79,7 +79,7 @@ export async function runWatcher(config: ParityConfig, pidPath: string): Promise
       return;
     }
     log(`[${label}] syncing`);
-    report(label, await syncEntry(entry, { allowSecrets: false }));
+    report(label, await syncEntry(entry, { allowSecrets: false, progress: false }));
   };
 
   const schedule = (label: string) => {
@@ -123,7 +123,7 @@ export async function runWatcher(config: ParityConfig, pidPath: string): Promise
 
   const initialSync = async () => {
     log("initial sync");
-    const outcomes = await syncAll(config.entries, { allowSecrets: false });
+    const outcomes = await syncAll(config.entries, { allowSecrets: false, progress: false });
     for (const [label, outcome] of outcomes) {
       report(label, outcome);
     }
