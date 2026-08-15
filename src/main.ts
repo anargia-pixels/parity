@@ -1,8 +1,8 @@
 import { openSync } from "node:fs";
-import { ensureStateDir, loadConfig, logFilePath, pidFilePath, type ParityConfig } from "../lib/config";
-import { isPidAlive } from "../lib/lock";
-import { readState, writeState } from "../lib/state";
-import { tryCatch, tryCatchSync } from "../lib/try-catch";
+import { ensureStateDir, loadConfig, logFilePath, pidFilePath, type ParityConfig } from "./lib/config";
+import { isPidAlive } from "./lib/lock";
+import { readState, writeState } from "./lib/state";
+import { tryCatch, tryCatchSync } from "./lib/try-catch";
 import { daemonPid, runWatcher } from "./watch";
 import { outcomeMessage, syncAll, syncEntry, timestamp } from "./sync";
 

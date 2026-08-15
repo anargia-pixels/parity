@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { findSecretsInDiff } from "../lib/secret-check";
+import { findSecretsInDiff } from "../src/lib/secret-check";
 
 describe("findSecretsInDiff", () => {
   test("detects common secret patterns on added lines", () => {

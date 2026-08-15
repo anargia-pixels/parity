@@ -1,10 +1,10 @@
 import { watch } from "node:fs";
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
-import type { ParityConfig } from "../lib/config";
-import { parityDir } from "../lib/config";
-import { isLocked, isPidAlive } from "../lib/lock";
-import { notify } from "../lib/notify";
-import { tryCatchSync } from "../lib/try-catch";
+import type { ParityConfig } from "./lib/config";
+import { parityDir } from "./lib/config";
+import { isLocked, isPidAlive } from "./lib/lock";
+import { notify } from "./lib/notify";
+import { tryCatchSync } from "./lib/try-catch";
 import { syncAll, syncEntry, timestamp, type SyncOutcome } from "./sync";
 
 const DEBOUNCE_MS = 3000;

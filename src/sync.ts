@@ -1,12 +1,12 @@
 import { existsSync } from "node:fs";
 import { hostname } from "node:os";
-import type { Entry } from "../lib/config";
-import { parityDir } from "../lib/config";
-import { git, hasRemote, identityFlags, isGitRepo, repoIdentity } from "../lib/git";
-import { acquireLock, releaseLock } from "../lib/lock";
-import { checkStagedForSecrets } from "../lib/secret-check";
-import type { EntryState } from "../lib/state";
-import { writeState } from "../lib/state";
+import type { Entry } from "./lib/config";
+import { parityDir } from "./lib/config";
+import { git, hasRemote, identityFlags, isGitRepo, repoIdentity } from "./lib/git";
+import { acquireLock, releaseLock } from "./lib/lock";
+import { checkStagedForSecrets } from "./lib/secret-check";
+import type { EntryState } from "./lib/state";
+import { writeState } from "./lib/state";
 
 export type SyncOutcome =
   | { status: "ok" }

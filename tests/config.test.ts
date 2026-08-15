@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { expandPath, parseToml } from "../lib/config";
+import { expandPath, parseToml } from "../src/lib/config";
 
 describe("expandPath", () => {
   test("expands $VAR and ${VAR}", () => {
