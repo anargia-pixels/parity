@@ -90,3 +90,7 @@ every push to main — no need to commit binaries by hand.
 
 Runtime files (pid, log, state, locks) live in `~/.config/parity/`, or in
 `$PARITY_STATE_DIR` when set.
+
+## License
+
+[MIT](LICENSE)
