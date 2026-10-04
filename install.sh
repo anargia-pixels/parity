@@ -4,11 +4,11 @@
 # Set PARITY_FORCE=1 to reinstall the current version.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/Doctorthe113/parity/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/anargia-pixels/parity/main/install.sh | bash
 
 set -euo pipefail
 
-REPO="Doctorthe113/parity"
+REPO="anargia-pixels/parity"
 INSTALL_DIR="${PARITY_INSTALL_DIR:-$HOME/.local/bin}"
 TARGET="$INSTALL_DIR/parity"
 OS_NAME=$(uname -s)

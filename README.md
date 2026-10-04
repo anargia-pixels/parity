@@ -38,7 +38,7 @@ Built with Go. The binary requires Git; Bun and Node.js are not required.
 1. Install:
 
    ```sh
-   curl -fsSL https://raw.githubusercontent.com/Doctorthe113/parity/main/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/anargia-pixels/parity/main/install.sh | bash
    ```
 
    This detects Linux or macOS and downloads the gzip-compressed binary for
