@@ -6,10 +6,7 @@ Wants=network-online.target
 [Service]
 Type=simple
 # Install the compiled binary first:
-#   go build -o parity .
-#   install -Dm755 parity ~/.local/bin/parity
-# Logs go to the journal; errors use error priority:
-#   journalctl --user -u parity -p err
+#   bun run build && install -Dm755 parity ~/.local/bin/parity
 ExecStart=%h/.local/bin/parity watch --foreground
 Restart=on-failure
 RestartSec=10

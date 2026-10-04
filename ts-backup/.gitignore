@@ -1,4 +1,4 @@
-# dependencies (archived TypeScript app)
+# dependencies (bun install)
 node_modules
 
 # output
@@ -36,8 +36,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # parity
 parity.toml
 /parity
-*.test
-/coverage.out
 
 # raw release binaries (the .gz files are committed)
 release/parity-linux-x64

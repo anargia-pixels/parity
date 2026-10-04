@@ -6,7 +6,6 @@ on:
       - main
     paths-ignore:
       - release/**
-      - ts-backup/**
 
 permissions:
   contents: write
@@ -18,31 +17,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v7
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          go-version: stable
+          bun-version: latest
 
       - name: Install dependencies
-        run: go mod download
+        run: bun install
 
       - name: Test
-        run: go test -race ./...
-
-      - name: Vet
-        run: go vet ./...
+        run: bun test
 
       - name: Build release binaries
-        run: sh scripts/build-release.sh
+        run: bun run build:release
 
       - name: Commit binaries
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add release/
-          if git diff --cached --quiet -- release/; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "release binaries unchanged"
             exit 0
           fi
+          git add release/
           git commit -m "Build release binaries"
           git push

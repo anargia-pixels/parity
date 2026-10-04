@@ -1,0 +1,17 @@
+# Parity example config — copy to parity.toml and edit.
+#
+# Each [label] table maps one local git folder (with a remote configured)
+# to a unique name shared between machines:
+#   label     — unique identifier, same on every device
+#   local_dir — machine-specific path; $VAR, ${VAR} and ~ are expanded
+#
+# The folder must already be a git repository with a remote.
+
+[opencode]
+local_dir = "$HOME/.config/opencode"
+
+[ghostty]
+local_dir = "$HOME/.config/ghostty"
+
+[neovim]
+local_dir = "$HOME/.config/nvim"
