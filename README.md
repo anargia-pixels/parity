@@ -42,9 +42,10 @@ Built with Go. The binary requires Git; Bun and Node.js are not required.
    ```
 
    This detects Linux or macOS and downloads the gzip-compressed binary for
-   your architecture (x86_64 or arm64) from the repo's `release/` folder into
-   `~/.local/bin` (override with `PARITY_INSTALL_DIR`). Binaries are rebuilt
-   automatically on every push to main by GitHub Actions. Make sure
+   your architecture (x86_64 or arm64) from the latest
+   [GitHub release](https://github.com/anargia-pixels/parity/releases) into
+   `~/.local/bin` (override with `PARITY_INSTALL_DIR`). GitHub Actions publishes
+   a new release when a push to main changes the Go code. Make sure
    `~/.local/bin` is on your PATH.
 
    Run the same command to update. The installer shows the installed and
@@ -199,8 +200,9 @@ The tests use temporary local Git remotes and cover config validation, secret
 checks, stash recovery, file selection, locks, status, progress, and watcher
 startup and shutdown. They do not need GitHub access.
 
-`release/` is kept up to date by the `Build release binaries` workflow on
-every push to main — no need to commit binaries by hand.
+The `Build release binaries` workflow tests, builds, and publishes a GitHub
+release tagged with the version when a push to main changes the Go code or
+build scripts. `release/` is a local build folder and is not committed.
 
 Runtime files (pid, log, state, locks) live in `~/.config/parity/`, or in
 `$PARITY_STATE_DIR` when set.

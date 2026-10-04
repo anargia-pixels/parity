@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - release/**
-      - ts-backup/**
+    # Publish a release only when the binary can change.
+    paths:
+      - main.go
+      - go.mod
+      - go.sum
+      - internal/**
+      - scripts/**
+      - .github/workflows/build-release.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -35,14 +41,14 @@ jobs:
       - name: Build release binaries
         run: sh scripts/build-release.sh
 
-      - name: Commit binaries
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add release/
-          if git diff --cached --quiet -- release/; then
-            echo "release binaries unchanged"
+          version=$(cat release/version)
+          if gh release view "$version" > /dev/null 2>&1; then
+            echo "release $version already exists"
             exit 0
           fi
-          git commit -m "Build release binaries"
-          git push
+          gh release create "$version" release/*.gz release/version \
+            --target "$GITHUB_SHA" --title "parity $version" --notes "Built from $GITHUB_SHA." --latest

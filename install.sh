@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Install or update the parity binary for this machine from the repo's
-# release folder into ~/.local/bin (or $PARITY_INSTALL_DIR when set).
+# Install or update the parity binary for this machine from the latest
+# GitHub release into ~/.local/bin (or $PARITY_INSTALL_DIR when set).
 # Set PARITY_FORCE=1 to reinstall the current version.
 #
 # Usage:
@@ -32,11 +32,9 @@ case "$MACHINE" in
     ;;
 esac
 
-# Read release files through the API: raw.githubusercontent.com caches files
-# for several minutes after a push. Binaries are gzip-compressed.
-CONTENTS_URL="https://api.github.com/repos/${REPO}/contents/release"
+# Release tags are parity versions. Binaries are gzip-compressed.
+RELEASES_URL="https://github.com/${REPO}/releases"
 ASSET="parity-${OS}-${ARCH}.gz"
-RAW_HEADER="Accept: application/vnd.github.raw"
 
 format_size() {
   awk -v bytes="$1" 'BEGIN { printf "%.1f MB", bytes / 1048576 }'
@@ -51,7 +49,10 @@ installed_version() {
   esac
 }
 
-if ! latest=$(curl -fsSL --retry 3 -H "$RAW_HEADER" "$CONTENTS_URL/version"); then
+# releases/latest redirects to the newest release's tag page.
+latest_url=$(curl -fsSL --retry 3 -o /dev/null -w '%{url_effective}' "$RELEASES_URL/latest" || true)
+latest=${latest_url##*/tag/}
+if [ -z "$latest_url" ] || [ "$latest" = "$latest_url" ]; then
   echo "error: could not read the latest parity version from GitHub; try again later" >&2
   exit 1
 fi
@@ -75,7 +76,8 @@ else
   echo "Installing parity $latest (${OS}-${ARCH})"
 fi
 
-download_size=$(curl -fsSL --retry 3 "$CONTENTS_URL/$ASSET" | grep -o '"size": *[0-9]*' | grep -o '[0-9]*$' || true)
+ASSET_URL="$RELEASES_URL/download/$latest/$ASSET"
+download_size=$(curl -fsSIL --retry 3 "$ASSET_URL" | tr -d '\r' | awk 'tolower($1) == "content-length:" { size = $2 } END { print size }' || true)
 if [ -n "$download_size" ]; then
   echo "Downloading $ASSET ($(format_size "$download_size"))"
 else
@@ -88,7 +90,7 @@ mkdir -p "$INSTALL_DIR"
 tmp_gz=$(mktemp "${TMPDIR:-/tmp}/parity-download.XXXXXX")
 tmp_binary=$(mktemp "$INSTALL_DIR/.parity-new.XXXXXX")
 trap 'rm -f "$tmp_gz" "$tmp_binary"' EXIT
-curl -fL --retry 3 --progress-bar -H "$RAW_HEADER" -o "$tmp_gz" "$CONTENTS_URL/$ASSET"
+curl -fL --retry 3 --progress-bar -o "$tmp_gz" "$ASSET_URL"
 gunzip -c "$tmp_gz" > "$tmp_binary"
 chmod 755 "$tmp_binary"
 

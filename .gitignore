@@ -39,6 +39,5 @@ parity.toml
 *.test
 /coverage.out
 
-# raw release binaries (the .gz files are committed)
-release/parity-linux-x64
-release/parity-linux-arm64
+# release binaries are published as GitHub Releases by CI
+/release/
