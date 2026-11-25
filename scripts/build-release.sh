@@ -23,7 +23,7 @@ for go_os in linux darwin; do
     binary_name="parity-$go_os-$release_arch"
     CGO_ENABLED=0 GOOS="$go_os" GOARCH="$go_arch" \
       go build -trimpath \
-      -ldflags="-s -w -X github.com/Doctorthe113/parity/internal/parity.version=$release_version" \
+      -ldflags="-s -w -X github.com/anargia-pixels/parity/internal/parity.version=$release_version" \
       -o "$task_build_dir/$binary_name" .
     gzip -n -9 -c "$task_build_dir/$binary_name" > "$task_build_dir/$binary_name.gz"
   done

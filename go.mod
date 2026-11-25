@@ -1,4 +1,4 @@
-module github.com/Doctorthe113/parity
+module github.com/anargia-pixels/parity
 
 go 1.24.0
 

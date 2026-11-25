@@ -29,7 +29,7 @@ Built with Bun. No runtime dependencies.
 1. Install:
 
    ```sh
-   curl -fsSL https://raw.githubusercontent.com/Doctorthe113/parity/main/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/anargia-pixels/parity/main/install.sh | bash
    ```
 
    This downloads the gzip-compressed binary for your architecture (x86_64

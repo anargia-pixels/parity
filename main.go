@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Doctorthe113/parity/internal/parity"
+	"github.com/anargia-pixels/parity/internal/parity"
 )
 
 func main() {
